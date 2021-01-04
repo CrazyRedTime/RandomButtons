@@ -9,10 +9,9 @@ const getRandomNumber = (max) => {
 
 
 const Button = (props) => {
-  const id = props.id;
   const value = props.value;
   return (
-    <button key={id} disabled={props.disabled} onClick={props.click}>{value}</button>
+    <button disabled={props.disabled} onClick={props.click}>{value}</button>
   )
 }
 
@@ -77,7 +76,7 @@ class Buttons extends React.Component {
     const buttons = [];
     const activeButton = this.state.activeButtonIndex;
     for (let i = 0; i < this.state.buttonsCount; i++) {
-      buttons.push(<Button id={i} key={i} disabled={!(i === activeButton)} click={this.click} value={i === activeButton ? 'Active' : 'Disabled'}/>)
+      buttons.push(<Button key={i} disabled={!(i === activeButton)} click={this.click} value={i === activeButton ? 'Active' : 'Disabled'}/>)
     }
     return (
         <>
