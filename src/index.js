@@ -77,7 +77,7 @@ class Buttons extends React.Component {
     const buttons = [];
     const activeButton = this.state.activeButtonIndex;
     for (let i = 0; i < this.state.buttonsCount; i++) {
-      buttons.push(<Button id={i} disabled={!(i === activeButton)} click={this.click} value={i === activeButton ? 'Active' : 'Disabled'}/>)
+      buttons.push(<Button id={i} key={i} disabled={!(i === activeButton)} click={this.click} value={i === activeButton ? 'Active' : 'Disabled'}/>)
     }
     return (
         <>
