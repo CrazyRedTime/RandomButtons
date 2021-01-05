@@ -76,7 +76,7 @@ class Buttons extends React.Component {
     return (
       <form onSubmit={this.formSubmit}>
         <label>
-          Enter buttons count&#40;must be &#60;&#61;300 and multiple of 10&#41;
+          Enter buttons count&#40;must be less than 300 and multiple of 10&#41;
           <input type="number" required min='10' max='300' step='10' onChange={this.ButtonsCountChange} value={this.state.formValueButtons} />
         </label>
         <label>
