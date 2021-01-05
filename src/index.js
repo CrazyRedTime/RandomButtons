@@ -24,12 +24,14 @@ class Buttons extends React.Component {
       activeButtonIndex: null,
       formValueButtons: '',
       formValueTimer: '',
-      timer: 0
+      timer: 0,
+      gameIsStarted: false
     }
   }
 
   stopGame = () => {
-    this.setState({ activeButtonIndex: null })
+    this.setState({ activeButtonIndex: null });
+    this.setState({ gameIsStarted: false });
   }
 
   click = (e) => {
@@ -62,9 +64,12 @@ class Buttons extends React.Component {
     const secondsCount = Number(this.state.formValueTimer);
     this.setState({ buttonsCount: buttonsCount });
     this.setState({ activeButtonIndex: getRandomNumber(buttonsCount - 1) });
-    this.setState({ timer: secondsCount })
+    this.setState({ timer: secondsCount });
+    this.setState({ totalClicks: 0 });
+    this.setState({ gameIsStarted: true });
     setTimeout(this.stopGame, secondsCount * 1000);
-    setInterval(this.changeTimer, 1000);
+    let timerId = setInterval(this.changeTimer, 1000);
+    setTimeout(() => { clearInterval(timerId)}, secondsCount * 1000);
   }
 
   renderForm () {
@@ -78,7 +83,7 @@ class Buttons extends React.Component {
           Enter timer value&#40;must be between 5 and 20 and multiple of 5&#41;
           <input type="number" required min='5' max='20' step='5' onChange={this.timerOnChange} value={this.state.formValueTimer} />
         </label>
-        <input type="submit" value="Start the game!" />
+        <input type="submit" value="Start the game!" disabled={this.state.gameIsStarted}/>
       </form>
     )
   }
@@ -89,7 +94,7 @@ class Buttons extends React.Component {
         <h3>Total clicks on buttons: {this.state.totalClicks}. Time left: {this.state.timer} seconds</h3>
       )
     }
-    return null;
+    return null;   
   }
 
   render () {

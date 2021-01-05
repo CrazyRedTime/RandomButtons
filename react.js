@@ -22,8 +22,16 @@ class Buttons extends React.Component {
       buttonsCount: null,
       totalClicks : 0,
       activeButtonIndex: null,
-      formValue: '',
+      formValueButtons: '',
+      formValueTimer: '',
+      timer: 0,
+      gameIsStarted: false
     }
+  }
+
+  stopGame = () => {
+    this.setState({ activeButtonIndex: null });
+    this.setState({ gameIsStarted: false });
   }
 
   click = (e) => {
@@ -33,34 +41,35 @@ class Buttons extends React.Component {
     this.setState({ totalClicks: this.state.totalClicks + 1 });
   }
 
-  formChange = (e) => {
+  ButtonsCountChange = (e) => {
     e.preventDefault();
-    const value = Number(e.target.value);
-    if (Number.isInteger(value)) {
-      this.setState({ formValue: value })
+    this.setState({ formValueButtons: e.target.value })
+  }
+
+  timerOnChange = (e) => {
+    e.preventDefault();
+    this.setState({ formValueTimer: e.target.value })
+    
+  }
+
+  changeTimer = () => {
+    if (this.state.timer) {
+      this.setState({ timer: this.state.timer - 1 })
     }
   }
 
   formSubmit = (e) => {
     e.preventDefault();
-    const buttonsCount = Number(this.state.formValue);
-    if (!(buttonsCount % 10) && buttonsCount <= 300) {
-      this.setState({ buttonsCount: buttonsCount });
-      this.setState({ activeButtonIndex: getRandomNumber(buttonsCount - 1) });
-      this.setState({ warning: false })
-    } else {
-      this.setState({ warning: true });
-      this.setState({ buttonsCount: null });
-    }
-  }
-
-  renderWarning () {
-    if(this.state.warning) {
-      return (
-        <h3 className='warning'>Enter a number that meets the requirements</h3>
-      )
-    }
-    return null;
+    const buttonsCount = Number(this.state.formValueButtons);
+    const secondsCount = Number(this.state.formValueTimer);
+    this.setState({ buttonsCount: buttonsCount });
+    this.setState({ activeButtonIndex: getRandomNumber(buttonsCount - 1) });
+    this.setState({ timer: secondsCount });
+    this.setState({ totalClicks: 0 });
+    this.setState({ gameIsStarted: true });
+    setTimeout(this.stopGame, secondsCount * 1000);
+    let timerId = setInterval(this.changeTimer, 1000);
+    setTimeout(() => { clearInterval(timerId)}, secondsCount * 1000);
   }
 
   renderForm () {
@@ -68,11 +77,24 @@ class Buttons extends React.Component {
       <form onSubmit={this.formSubmit}>
         <label>
           Enter buttons count&#40;must be &#60;&#61;300 and multiple of 10&#41;
-          <input type="text" onChange={this.formChange} value={this.state.formValue} />
+          <input type="number" required min='10' max='300' step='10' onChange={this.ButtonsCountChange} value={this.state.formValueButtons} />
         </label>
-        <input type="submit" value="Submit" />
+        <label>
+          Enter timer value&#40;must be between 5 and 20 and multiple of 5&#41;
+          <input type="number" required min='5' max='20' step='5' onChange={this.timerOnChange} value={this.state.formValueTimer} />
+        </label>
+        <input type="submit" value="Start the game!" disabled={this.state.gameIsStarted}/>
       </form>
     )
+  }
+
+  renderState () {
+    if (this.state.buttonsCount) {
+      return (
+        <h3>Total clicks on buttons: {this.state.totalClicks}. Time left: {this.state.timer} seconds</h3>
+      )
+    }
+    return null;   
   }
 
   render () {
@@ -84,9 +106,8 @@ class Buttons extends React.Component {
     return (
         <>
         {this.renderForm()}
-        {this.renderWarning()}
         {buttons}
-        <h3>Total clicks on buttons: {this.state.totalClicks}</h3>
+        {this.renderState()}
         </>
     )
   }
