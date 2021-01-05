@@ -22,7 +22,7 @@ class Buttons extends React.Component {
       buttonsCount: null,
       totalClicks : 0,
       activeButtonIndex: null,
-      formValue: null,
+      formValue: '',
     }
   }
 
@@ -35,13 +35,16 @@ class Buttons extends React.Component {
 
   formChange = (e) => {
     e.preventDefault();
-    this.setState({ formValue: e.target.value })
+    const value = Number(e.target.value);
+    if (Number.isInteger(value)) {
+      this.setState({ formValue: value })
+    }
   }
 
   formSubmit = (e) => {
     e.preventDefault();
     const buttonsCount = Number(this.state.formValue);
-    if (Number.isInteger(buttonsCount) && !(buttonsCount % 10) && buttonsCount <= 300) {
+    if (!(buttonsCount % 10) && buttonsCount <= 300) {
       this.setState({ buttonsCount: buttonsCount });
       this.setState({ activeButtonIndex: getRandomNumber(buttonsCount - 1) });
       this.setState({ warning: false })
@@ -65,7 +68,7 @@ class Buttons extends React.Component {
       <form onSubmit={this.formSubmit}>
         <label>
           Enter buttons count&#40;must be &#60;&#61;300 and multiple of 10&#41;
-          <input type="text" onChange={this.formChange} value={this.state.value} />
+          <input type="text" onChange={this.formChange} value={this.state.formValue} />
         </label>
         <input type="submit" value="Submit" />
       </form>
