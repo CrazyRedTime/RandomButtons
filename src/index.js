@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 
@@ -15,102 +15,94 @@ const Button = (props) => {
   )
 }
 
-class Buttons extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      buttonsCount: null,
-      totalClicks : 0,
-      activeButtonIndex: null,
-      formValueButtons: '',
-      formValueTimer: '',
-      timer: 0,
-      gameIsStarted: false
+const Buttons = () => {
+  const [buttonsCount, setButtonsCount] = useState(null);
+  const [totalClicks, setTotalClicks] = useState(0);
+  const [activeButtonIndex, setActiveButtonIndex] = useState(null);
+  const [formValueButtons, setFormValueButtons] = useState('');
+  const [formValueTimer, setFormValueTimer] = useState('');
+  const [timer, setTimer] = useState(0);
+  const [gameIsStarted, setGameIsStarted] = useState(false);
+
+  const stopGame = () => {
+    setActiveButtonIndex(null);
+    setGameIsStarted(false);
+  }
+
+  const click = (e) => {
+    e.preventDefault();
+    const newActiveButton = getRandomNumber(buttonsCount - 1);
+    setActiveButtonIndex(newActiveButton);
+    setTotalClicks(totalClicks + 1);
+  }
+
+  const buttonsCountChange = (e) => {
+    e.preventDefault();
+    setFormValueButtons(e.target.value)
+  }
+
+  const timerOnChange = (e) => {
+    e.preventDefault();
+    setFormValueTimer(e.target.value);
+  }
+
+  const changeTimer = () => {
+    if (timer) {
+      setTimer(timer - 1 )
     }
   }
 
-  stopGame = () => {
-    this.setState({ activeButtonIndex: null });
-    this.setState({ gameIsStarted: false });
-  }
-
-  click = (e) => {
+  const formSubmit = (e) => {
     e.preventDefault();
-    const newActiveButton = getRandomNumber(this.state.buttonsCount - 1);
-    this.setState({ activeButtonIndex: newActiveButton });
-    this.setState({ totalClicks: this.state.totalClicks + 1 });
-  }
-
-  ButtonsCountChange = (e) => {
-    e.preventDefault();
-    this.setState({ formValueButtons: e.target.value })
-  }
-
-  timerOnChange = (e) => {
-    e.preventDefault();
-    this.setState({ formValueTimer: e.target.value })
-    
-  }
-
-  changeTimer = () => {
-    if (this.state.timer) {
-      this.setState({ timer: this.state.timer - 1 })
-    }
-  }
-
-  formSubmit = (e) => {
-    e.preventDefault();
-    const buttonsCount = Number(this.state.formValueButtons);
-    const secondsCount = Number(this.state.formValueTimer);
-    this.setState({ buttonsCount: buttonsCount });
-    this.setState({ activeButtonIndex: getRandomNumber(buttonsCount - 1) });
-    this.setState({ timer: secondsCount });
-    this.setState({ totalClicks: 0 });
-    this.setState({ gameIsStarted: true });
-    setTimeout(this.stopGame, secondsCount * 1000);
-    let timerId = setInterval(this.changeTimer, 1000);
+    const newButtonsCount = Number(formValueButtons);
+    const secondsCount = Number(formValueTimer);
+    setButtonsCount(newButtonsCount);
+    setActiveButtonIndex(getRandomNumber(newButtonsCount - 1));
+    setTimer(secondsCount);
+    setTotalClicks(0);
+    setGameIsStarted(true);
+    setTimeout(stopGame, secondsCount * 1000);
+    let timerId = setInterval(changeTimer, 1000);
     setTimeout(() => { clearInterval(timerId)}, secondsCount * 1000);
   }
 
-  renderForm () {
+  const renderForm = () => {
     return (
-      <form onSubmit={this.formSubmit}>
+      <form onSubmit={formSubmit}>
         <label>
           Enter buttons count&#40;must be less than 300 and multiple of 10&#41;
-          <input type="number" required min='10' max='300' step='10' onChange={this.ButtonsCountChange} value={this.state.formValueButtons} />
+          <input type="number" required min='10' max='300' step='10' onChange={buttonsCountChange} value={formValueButtons} />
         </label>
         <label>
           Enter timer value&#40;must be between 5 and 20 and multiple of 5&#41;
-          <input type="number" required min='5' max='20' step='5' onChange={this.timerOnChange} value={this.state.formValueTimer} />
+          <input type="number" required min='5' max='20' step='5' onChange={timerOnChange} value={formValueTimer} />
         </label>
-        <input type="submit" value="Start the game!" disabled={this.state.gameIsStarted}/>
+        <input type="submit" value="Start the game!" disabled={gameIsStarted}/>
       </form>
     )
   }
 
-  renderState () {
-    if (this.state.buttonsCount) {
+  const renderState = () => {
+    if (buttonsCount) {
       return (
-        <h3>Total clicks on buttons: {this.state.totalClicks}. Time left: {this.state.timer} seconds</h3>
+        <h3>Total clicks on buttons: {totalClicks}. Time left: {timer} seconds</h3>
       )
     }
-    return null;   
+    return null;
   }
 
-  render () {
-    const buttons = [];
-    const activeButton = this.state.activeButtonIndex;
-    for (let i = 0; i < this.state.buttonsCount; i++) {
-      buttons.push(<Button key={i} disabled={!(i === activeButton)} click={this.click} value={i === activeButton ? 'Active' : 'Disabled'}/>)
-    }
-    return (
-        <>
-        {this.renderForm()}
-        {buttons}
-        {this.renderState()}
-        </>
-    )
+  const buttons = [];
+  const activeButton = activeButtonIndex;
+  for (let i = 0; i < buttonsCount; i++) {
+    buttons.push(<Button key={i} disabled={!(i === activeButton)} click={click} value={i === activeButton ? 'Active' : 'Disabled'}/>)
   }
+  return (
+       <>
+      {renderForm()}
+      {buttons}
+      {renderState()}
+      </>
+  )
 }
 
 
